@@ -56,9 +56,88 @@ button.addEventListener("click", () => {
           blk.style.opacity = 0
           blk.style.transform = "scale(0.2)"
           resolve("3")
+          }, 800)
+        })
+      }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      function chatV() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.opacity = 0
+          
+          chatHeader.style.opacity = 0
+          
+          
+          resolve("3")
+          }, 2000)
+        })
+      }
+      
+      
+      function chatCome() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.backgroundColor = "transparent"
+          chatArea.style.width = "100vw"
+          chatArea.style.left = "0vw"
+          chatArea.style.top = "7vh"
+          chatArea.style.maxHeight = "75vh"
+          chatArea.style.minHeight = "15vh"
+          chatArea.style.boxShadow = "none"
+          chatArea.style.padding = "1vh 3vh 0.1vh 4vh"
+          chatHeader.style.backgroundColor = "transparent"
+          chatHeader.style.width = "100vw"
+          chatHeader.style.left = "0vw"
+          chatHeader.style.top = "1vh"
+          chatHeader.style.height = "6vh"
+          button.style.backgroundColor = "transparent"
+          button.style.transform = "scale(3)"
+          resolve("3")
           }, 1000)
         })
       }
+      
+      
+      function chatSee() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.opacity = 1
+          
+          chatHeader.style.opacity = 1
+          
+          
+          resolve("3")
+          }, 850)
+        })
+      }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
       function telip() {
         return new Promise((resolve, reject) => {
@@ -78,7 +157,7 @@ button.addEventListener("click", () => {
                   blk.style.opacity = 1;
                   blk.style.transform = "scale(0.5)";
                   resolve("S1")
-                }, 2000)
+                }, 1900)
               })
             }
             
@@ -99,7 +178,7 @@ button.addEventListener("click", () => {
                   blk.style.transform = "scale(0)";
                   isRunning = false;
                   button.disabled = false;
-                  button.style.backgroundColor = "#0092C1";
+                  button.style.backgroundColor = "transparent";//#0092C1
                   resolve("S3")
                 }, 1000)
               })
@@ -119,7 +198,13 @@ button.addEventListener("click", () => {
       startblk().then(() => {
         goball().then(() => {
           endblk().then(() => {
-            telip()
+            chatV().then(() => {
+              chatCome().then(() => {
+                chatSee().then(() => {
+                  telip()
+                })
+              })
+            })
           })
         })
       
@@ -133,6 +218,99 @@ button.addEventListener("click", () => {
     else {
       visible = 1
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      function chatV() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.opacity = 0
+          
+          chatHeader.style.opacity = 0
+          
+          
+          resolve("3")
+          }, 1500)
+        })
+      }
+      
+      
+      function chatCome() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.backgroundColor = "white"
+          chatArea.style.width = "68vw"
+          chatArea.style.left = "16.5vw"
+          chatArea.style.top = "53vh"
+          chatArea.style.maxHeight = "26.7vh"
+          chatArea.style.minHeight = "4vh"
+          chatArea.style.boxShadow = "0 0 5vh #6D74C4"
+          chatArea.style.padding = "1vh 2vh 0.1vh 2vh"
+          
+          chatHeader.style.backgroundColor = "#D4D4D4"
+          chatHeader.style.width = "68vw"
+          chatHeader.style.left = "16.5vw"
+          chatHeader.style.top = "50.4vh"
+          chatHeader.style.height = "2vh"
+          
+          button.style.transform = "scale(1)"
+          resolve("3")
+          }, 1500)
+        })
+      }
+      
+      
+      function chatSee() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+          chatArea.style.opacity = 1
+          
+          chatHeader.style.opacity = 1
+          
+          
+          resolve("3")
+          }, 2000)
+        })
+      }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      chatV().then(() => {
+        chatCome().then(() => {
+          chatSee()
+        })
+      })
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       function bigbalk() {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
@@ -142,7 +320,7 @@ button.addEventListener("click", () => {
                 setTimeout(() => {
                   blk.style.opacity = 1
                   blk.style.transform = "scale(0.5)"
-                  console.log("b1")
+                  
                   resolve("b1")
                 }, 1000)
               })
@@ -152,7 +330,7 @@ button.addEventListener("click", () => {
                 setTimeout(() => {
                   ball.style.opacity = 0
                   ball.style.transform = "scale(0)"
-                  console.log("b2")
+                  
                   resolve("b2")
                 }, 2000)
               })
@@ -162,7 +340,7 @@ button.addEventListener("click", () => {
                 setTimeout(() => {
                   blk.style.opacity = 0
                   blk.style.transform = "scale(0)"
-                  console.log("b3")
+                  
                   resolve("b3")
                 }, 1000)
               })
@@ -197,7 +375,7 @@ button.addEventListener("click", () => {
           setTimeout(() => {
             blk.style.opacity = 1
             blk.style.transform = "scale(1.5)";
-            console.log("steat");
+            
             resolve("4");
           }, 8000);
           
@@ -320,6 +498,7 @@ const chatBox = document.getElementById("chatBox");
 const btn = document.getElementById("mainBtn");
 const input = document.getElementById("textInput");
 const chatArea = document.getElementById("chatArea");
+const chatHeader = document.getElementById("chatHeader");
 
 input.addEventListener("input", () => {
       if (input.value.trim() === "") {
@@ -332,9 +511,81 @@ input.addEventListener("input", () => {
     function handleClick() {
       if (!expanded) {
         chatBox.classList.add("expanded");
+        
+        function AreaV() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatHeader.classList.remove("expand");
+            
+            resolve("4");
+          }, 400);
+        });
+      };
+        
+        function headE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            
+            chatHeader.classList.add("expanded");
+            
+            resolve("4");
+          }, 800);
+          
+        });
+      };
+        
+        
+        
+        function headXE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatHeader.classList.add("expande");
+            
+            
+            resolve("4");
+          }, 500);
+          
+        });
+      };
+      
+      
+      
+      
+      function AreaE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatArea.classList.add("expanded");
+            
+            
+            resolve("4");
+          }, 1000);
+        });
+      };
+
+
+
+        
+        
+        AreaV().then(() => {
+          headE().then(() => {
+            headXE().then(() => {
+              AreaE()
+            });
+          });
+        })
+        
+        
         btn.innerHTML = "&#8593;";
         expanded = true;
-      } else {
+      } 
+      
+      
+      
+      
+      
+      
+      
+      else {
         const value = input.value.trim();
         if (value) {
           
@@ -351,7 +602,79 @@ input.addEventListener("input", () => {
       }
     }
     function resetbtn() {
+    
+    
+    if (
+    chatArea.style.backgroundColor === "transparent" ||
+    chatArea.classList.contains("fullscreen")) {
+    console.log("⚠️ Fold blocked: fullscreen mode active");
+    return;
+  }
     chatBox.classList.remove("expanded"); 
+    
+    function AreaE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatArea.classList.add("expanded");
+            console.log("steat");
+            resolve("4");
+          }, 500);
+        });
+      };
+      
+      
+      
+      
+      function AreaXE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatArea.classList.remove("expanded"); 
+            
+            resolve("4");
+          }, 1000);
+        });
+      };
+      
+      
+      
+      
+      
+      function headE() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatHeader.classList.remove("expande");
+            
+            resolve("4");
+          }, 1000);
+        });
+      };
+      
+      
+      
+      
+      
+      function AreaV() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            chatHeader.classList.add("expand");
+            
+            resolve("4");
+          }, 1000);
+        });
+      };
+    
+    AreaE().then(() => {
+      AreaXE().then(() => {
+        headE().then(() => {
+          AreaV()
+        })
+      })
+    })
+    
+    
+        
+        
+     
     btn.innerHTML = "&#8594;";
     expanded = false; 
     };
@@ -371,21 +694,59 @@ input.addEventListener("input", () => {
 
   chatArea.scrollTop = chatArea.scrollHeight;
 }
+window.onload = () => {
+  addMessage("Hi, how can I help you? ", "bot");
+};
+
+
+
+
 
 function getBotReply(msg) {
-  const text = msg.toLowerCase();
-
+  const text = msg.toLowerCase().trim();
+  
   if (text === "hi" || text === "hello" || text === "hay") {
     return "Hi, how are you?";
-  } else if (text === "name" || text === "naam") {
-    return "My name is AI assistant";
-  } else {
-    return "Mujhe samajh nahi aaya.";
+  }else if (text.includes("name") || text.includes("naam") || text.includes("kon")) {
+    return "My name is AI assistant.";
+    }else if (text.includes("namaste") ) {
+    return "namaste main aapki kya madad kar sakta hun ?";
+  } else if (text.includes("tum kya kar sakte ho") || text.includes("kya kar sakte ho") || text.includes("kar sakte ho") || text.includes("sakte ho")) {
+    return "Main aapki madad calculation mein kar sakta hoon:\n- percentage nikalna eg:20% of 500 = 100\n- divide(/), multiply(*), add(+), subtract(-)\napp ko jo bhi calculation chahiye app use is tarah likh sakte hai\n•This is an Example\n20% of 500\n2 (+,-,*,/) 3";
+  }
+  
+  // ✅ Check for proper percentage pattern: "25% of 400"
+  if (text.includes('% of')) {
+    const parts = text.split('% of');
+    const percent = parseFloat(parts[0].trim());
+    const number = parseFloat(parts[1].trim());
+    if (!isNaN(percent) && !isNaN(number)) {
+      const result = (percent / 100) * number;
+      return `${percent}% of ${number} = ${result}`;
+    } else {
+      return "❗ Please enter valid format like '25% of 400'";
+    }
+  }
+  
+  // ❌ Reject wrong % format like "25% 500" (no 'of')
+  if (text.includes('%')) {
+    return "❌ Please use correct format: '25% of 500'";
+  }
+  
+  // ✅ Basic Arithmetic Logic
+  try {
+    // Only allow safe math symbols
+    const safeExpression = text.replace(/[^-()\d*/+.]/g, '');
+    if (safeExpression) {
+      const result = eval(safeExpression);
+      return `Answer is: ${result}`;
+    } else {
+      return "Type a valid expression like '2 + 2'";
+    }
+  } catch (err) {
+    return "Sorry, I couldn't understand that.";
   }
 }
-
-
-
 
 
 
