@@ -4,7 +4,7 @@ let button = document.querySelector("#btn");
 let isRunning = false; 
 let visible = 1 ;
 let scale = 1 ;
-ball.style.top = "8vh"
+
 button.addEventListener("click", () => {
   console.log("click")
   if (isRunning) return; 
@@ -30,7 +30,7 @@ button.addEventListener("click", () => {
         return new Promise((resolve, reject) => {
           blk.style.opacity = 1
         blk.style.transform = "scale(1.5)"
-        blk.style.top = "8vh"
+        blk.style.top = "vh"
         resolve("1")
         });
         
@@ -377,10 +377,22 @@ function getBotReply(msg) {
 
   if (text === "hi" || text === "hello" || text === "hay") {
     return "Hi, how are you?";
-  } else if (text.includes("naam")) {
-    return "Main ek assistant hoon.";
+  } else if (text === "name" || text === "naam") {
+    return "My name is AI assistant";
   } else {
     return "Mujhe samajh nahi aaya.";
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
