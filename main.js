@@ -10,7 +10,7 @@ button.addEventListener("click", () => {
   if (isRunning) return; 
       isRunning = true;
       button.disabled = true;
-      button.style.backgroundColor = "#6A93A0"
+      button.style.backgroundColor = "red"
       
       
       
