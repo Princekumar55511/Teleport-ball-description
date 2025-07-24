@@ -763,7 +763,7 @@ function getBotReply(msg) {
 
 
 
-
+/*
 
 const recognition = new webkitSpeechRecognition(); 
 recognition.continuous = true; 
@@ -814,5 +814,68 @@ function speakText(text) {
 
 recognition.start();
 
+*/
 
+
+
+
+
+const recognition = new webkitSpeechRecognition(); 
+recognition.continuous = true; 
+recognition.interimResults = false; 
+recognition.lang = 'en-US';
+
+let listeningForQuestion = false; 
+
+recognition.onresult = function (event) { 
+  const lastResult = event.results[event.results.length - 1]; 
+  const speech = lastResult[0].transcript.trim().toLowerCase(); 
+  console.log("🎤 Heard:", speech);
+
+  if (!listeningForQuestion) { 
+    if (speech.includes("solve")) { 
+      listeningForQuestion = true;
+
+      // 🛑 Stop listening to avoid catching our own voice
+      recognition.stop(); 
+
+      speakText("Listening your question", () => {
+        // ✅ Start listening again after speaking
+        recognition.start(); 
+      });
+    }
+  } else {
+    addMessage(speech, "user"); 
+    const reply = getBotReply(speech); 
+
+    setTimeout(() => { 
+      addMessage(reply, "bot"); 
+      speakText(reply); // ✅ Speak the answer
+    }, 600); 
+
+    listeningForQuestion = false;
+  } 
+};
+
+recognition.onerror = (e) => { 
+  console.log("🎤 Error:", e.error);
+  recognition.stop(); 
+  setTimeout(() => recognition.start(), 2000);
+};
+
+recognition.onend = () => { 
+  console.log("🎤 Restarting recognition..."); 
+  recognition.start(); 
+};
+
+// ✅ Modified to support callback after speech
+function speakText(text, onEnd = null) {
+  const utter = new SpeechSynthesisUtterance(text);
+  if (onEnd) {
+    utter.onend = onEnd;
+  }
+  speechSynthesis.speak(utter);
+}
+
+recognition.start();
 
