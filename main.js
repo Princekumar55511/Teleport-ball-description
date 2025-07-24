@@ -757,3 +757,62 @@ function getBotReply(msg) {
 
 
 
+
+
+
+
+
+
+
+
+const recognition = new webkitSpeechRecognition(); 
+recognition.continuous = true; 
+recognition.interimResults = false; 
+recognition.lang = 'en-US';
+
+let listeningForQuestion = false; // Initially not listening for math
+
+recognition.onresult = function (event) { 
+  const lastResult = event.results[event.results.length - 1]; 
+  const speech = lastResult[0].transcript.trim().toLowerCase(); 
+  console.log("🎤 Heard:", speech);
+
+  if (!listeningForQuestion) { 
+    // 👂 Waiting for wake word
+    if (speech.includes("solve")) { 
+      listeningForQuestion = true; 
+      speakText("Listening your question");
+    }
+  } else {
+    addMessage(speech, "user"); 
+    const reply = getBotReply(speech); 
+    
+    setTimeout(() => { 
+      addMessage(reply, "bot"); 
+      speakText(reply); // 🔊 Yeh line add ki gayi hai taaki bot ka answer sunai de
+    }, 600); 
+
+    listeningForQuestion = false; // Reset 
+  } 
+};
+
+recognition.onerror = (e) => { 
+  console.log("🎤 Error:", e.error);
+  recognition.stop(); 
+  setTimeout(() => recognition.start(), 2000);
+};
+
+recognition.onend = () => { 
+  console.log("🎤 Restarting recognition..."); 
+  recognition.start(); 
+};
+
+function speakText(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utter);
+}
+
+recognition.start();
+
+
+
