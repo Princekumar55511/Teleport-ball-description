@@ -847,7 +847,7 @@ recognition.onresult = function (event) {
       });
     }
   } else {
-    addMessage(speech, "user",replace("Listening your question","")); 
+    addMessage(speech, "user"); 
     const reply = getBotReply(speech); 
 
     setTimeout(() => { 
