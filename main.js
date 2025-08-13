@@ -837,7 +837,9 @@ recognition.onresult = function (event) {
       listeningForQuestion = true;
 
       // 🛑 Stop listening to avoid catching our own voice
-      recognition.stop(); 
+      setTimeout(() => {
+          recognition.start(); 
+        }, 1000)
 
       speakText("Listening your question", () => {
         // ✅ Start listening again after speaking
