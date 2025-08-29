@@ -741,7 +741,7 @@ function getBotReply(msg) {
       const result = eval(safeExpression);
       return `Answer is: ${result}`;
     } else {
-      return "Type a valid expression like '2 + 2'";
+      return "Sorry, I couldn't understand that.";
     }
   } catch (err) {
     return "Sorry, I couldn't understand that.";
