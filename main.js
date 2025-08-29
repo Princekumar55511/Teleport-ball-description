@@ -832,29 +832,63 @@ recognition.onresult = function (event) {
   const speech = lastResult[0].transcript.trim().toLowerCase(); 
   console.log("🎤 Heard:", speech);
 
+
+  if (speech.includes("open")) {
+    let site = speech.replace("open", "").trim();
+
+    // ✅ Mapping of common websites
+    let websites = {
+        "google": "https://www.google.com",
+        "youtube": "https://www.youtube.com",
+        "instagram": "https://www.instagram.com",
+        "snapchat": "https://www.snapchat.com",
+        "facebook": "https://www.facebook.com",
+        "twitter": "https://www.twitter.com",
+        "whatsapp": "https://web.whatsapp.com"
+    };
+
+    // ✅ Agar bola "open d google" to bhi handle karega
+    site = site.replace("d ", "").trim();
+
+    // ✅ URL decide karo
+    let url = websites[site];
+
+    if (url) {
+        speakText(`Opening ${site}`);
+        window.open(url, "_blank");
+    } else {
+        speakText(`Sorry, I can't find ${site}`);
+    }
+
+    return; // ✅ Yahan return karenge taki aage calculation na chale
+}
+  
+  
+  
+  
+
   if (!listeningForQuestion) { 
     if (speech.includes("solve")) { 
       listeningForQuestion = true;
 
-      // 🛑 Stop listening to avoid catching our own voice
-      setTimeout(() => {
-          recognition.start(); 
-        }, 1000)
 
-      speakText("Listening your question", () => {
-        // ✅ Start listening again after speaking
-        recognition.start(); 
-      });
     }
   } else {
-    addMessage(speech, "user"); 
-    const reply = getBotReply(speech); 
+    
+    let cleanSpeech = speech.replace("solve", "").trim();
+    
+    addMessage(cleanSpeech, "user"); 
+    //const reply = getBotReply(speech);
+    
+    speakText("Solving " + cleanSpeech, () => {
+        const reply = getBotReply(cleanSpeech);
+      
 
     setTimeout(() => { 
       addMessage(reply, "bot"); 
       speakText(reply); // ✅ Speak the answer
     }, 600); 
-
+    });
     listeningForQuestion = false;
   } 
 };
