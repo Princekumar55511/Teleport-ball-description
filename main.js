@@ -820,24 +820,58 @@ recognition.start();
 
 
 
-const recognition = new webkitSpeechRecognition(); 
-recognition.continuous = true; 
-recognition.interimResults = false; 
-recognition.lang = 'en-US';
+// ------------------- Combined: Your commands + Robust auto-restart -------------------
 
-let listeningForQuestion = false; 
+// If speakText not defined earlier, define a simple one (won't override if exists)
+if (typeof speakText !== "function") {
+  function speakText(text, onEnd = null) {
+    const utter = new SpeechSynthesisUtterance(text);
+    if (onEnd) utter.onend = onEnd;
+    speechSynthesis.speak(utter);
+  }
+}
 
-recognition.onresult = function (event) { 
-  const lastResult = event.results[event.results.length - 1]; 
-  const speech = lastResult[0].transcript.trim().toLowerCase(); 
-  console.log("🎤 Heard:", speech);
+// (Optional) ensure addMessage/getBotReply exist in your file. They were part of your app.
+// If they are not defined, you can keep them or remove talk to bot parts.
 
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  if (speech.includes("open")) {
-    let site = speech.replace("open", "").trim();
+// State + control flags
+let recognition = null;
+let isRecognizing = false;
+let isStarting = false;
+let retryCount = 0;
+const MAX_RETRY = 6;
+let listeningForQuestion = false;
+let restartTimer = null;
 
-    // ✅ Mapping of common websites
-    let websites = {
+// Create and wire recognition instance (use this whenever we need fresh instance)
+function initRecognition() {
+  // If an old instance exists, remove handlers and null it
+  try {
+    if (recognition) {
+      recognition.onresult = null;
+      recognition.onend = null;
+      recognition.onerror = null;
+      recognition.onstart = null;
+    }
+  } catch (e) { /* ignore */ }
+
+  recognition = new window.SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US'; // keep your original language; change to 'hi-IN' if you want Hindi
+
+  // ---------- RESULT HANDLER (your original command logic) ----------
+  recognition.onresult = function (event) {
+    const lastResult = event.results[event.results.length - 1];
+    const speech = lastResult[0].transcript.trim().toLowerCase();
+    console.log("🎤 Heard:", speech);
+
+    // ---- "open" commands mapping ----
+    if (speech.includes("open")) {
+      let site = speech.replace("open", "").trim();
+      const websites = {
         "google": "https://www.google.com",
         "youtube": "https://www.youtube.com",
         "instagram": "https://www.instagram.com",
@@ -845,73 +879,152 @@ recognition.onresult = function (event) {
         "facebook": "https://www.facebook.com",
         "twitter": "https://www.twitter.com",
         "whatsapp": "https://web.whatsapp.com"
-    };
-
-    // ✅ Agar bola "open d google" to bhi handle karega
-    site = site.replace("d ", "").trim();
-
-    // ✅ URL decide karo
-    let url = websites[site];
-
-    if (url) {
+      };
+      site = site.replace("d ", "").trim();
+      const url = websites[site];
+      if (url) {
         speakText(`Opening ${site}`);
+        // open new tab (this will shift focus away; script will restart when you come back)
         window.open(url, "_blank");
-    } else {
+      } else {
         speakText(`Sorry, I can't find ${site}`);
+      }
+      return; // stop further processing for this result
     }
 
-    return; // ✅ Yahan return karenge taki aage calculation na chale
+    // ---- "solve" flow (your original) ----
+    if (!listeningForQuestion) {
+      if (speech.includes("solve")) {
+        listeningForQuestion = true;
+        // waiting for the next spoken part with the question
+      }
+    } else {
+      const cleanSpeech = speech.replace("solve", "").trim();
+      try { addMessage(cleanSpeech, "user"); } catch (e) { /* if addMessage not defined, ignore */ }
+
+      speakText("Solving " + cleanSpeech, () => {
+        const reply = (typeof getBotReply === "function") ? getBotReply(cleanSpeech) : "Sorry, bot logic missing";
+        setTimeout(() => {
+          try { addMessage(reply, "bot"); } catch (e) {}
+          speakText(reply);
+        }, 600);
+      });
+
+      listeningForQuestion = false;
+    }
+  };
+
+  // ---------- START / END / ERROR handlers for robust restart ----------
+  recognition.onstart = function () {
+    console.log("🎤 recognition.onstart");
+    isRecognizing = true;
+    isStarting = false;
+    retryCount = 0;
+  };
+
+  recognition.onend = function () {
+    console.log("🎤 recognition.onend (stopped)");
+    isRecognizing = false;
+    isStarting = false;
+    // If page is active, schedule a restart (small delay avoids InvalidStateError)
+    if (document.visibilityState === "visible" && document.hasFocus()) {
+      clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => startRecognitionWithRetry(), 300);
+    } else {
+      console.log("Page not active — will restart when visible/focused.");
+    }
+  };
+
+  recognition.onerror = function (e) {
+    console.warn("🎤 recognition.onerror:", e && e.error ? e.error : e);
+    isRecognizing = false;
+    isStarting = false;
+
+    // If permission blocked, inform and stop retrying
+    if (e && (e.error === "not-allowed" || e.error === "service-not-allowed" || e.error === "permission-denied")) {
+      console.error("Microphone permission denied. Please enable microphone permission for this site.");
+      return;
+    }
+
+    // Try to abort and then restart with backoff
+    try { recognition.abort(); } catch (_) { try { recognition.stop(); } catch (_) {} }
+    if (retryCount < MAX_RETRY) {
+      retryCount++;
+      const backoff = Math.min(200 * Math.pow(2, retryCount), 3000);
+      clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => startRecognitionWithRetry(), backoff);
+    } else {
+      console.warn("Max retry reached for starting recognition.");
+    }
+  };
 }
-  
-  
-  
-  
 
-  if (!listeningForQuestion) { 
-    if (speech.includes("solve")) { 
-      listeningForQuestion = true;
+// Safely start recognition with retry/backoff mechanism
+function startRecognitionWithRetry() {
+  if (isRecognizing || isStarting) return;
+  isStarting = true;
 
+  if (!recognition) initRecognition();
 
+  try {
+    recognition.start();
+    // onstart will set flags
+  } catch (err) {
+    console.warn("start() threw:", err);
+    // Recreate recognition and retry after backoff
+    isStarting = false;
+    recognition = null;
+    if (retryCount < MAX_RETRY) {
+      retryCount++;
+      const backoff = Math.min(200 * Math.pow(2, retryCount), 3000);
+      clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => {
+        initRecognition();
+        startRecognitionWithRetry();
+      }, backoff);
+    } else {
+      console.error("Could not start recognition after retries.");
     }
-  } else {
-    
-    let cleanSpeech = speech.replace("solve", "").trim();
-    
-    addMessage(cleanSpeech, "user"); 
-    //const reply = getBotReply(speech);
-    
-    speakText("Solving " + cleanSpeech, () => {
-        const reply = getBotReply(cleanSpeech);
-      
-
-    setTimeout(() => { 
-      addMessage(reply, "bot"); 
-      speakText(reply); // ✅ Speak the answer
-    }, 600); 
-    });
-    listeningForQuestion = false;
-  } 
-};
-
-recognition.onerror = (e) => { 
-  console.log("🎤 Error:", e.error);
-  recognition.stop(); 
-  setTimeout(() => recognition.start(), 2000);
-};
-
-recognition.onend = () => { 
-  console.log("🎤 Restarting recognition..."); 
-  recognition.start(); 
-};
-
-// ✅ Modified to support callback after speech
-function speakText(text, onEnd = null) {
-  const utter = new SpeechSynthesisUtterance(text);
-  if (onEnd) {
-    utter.onend = onEnd;
   }
-  speechSynthesis.speak(utter);
 }
 
-recognition.start();
+function stopRecognition() {
+  try {
+    if (recognition) {
+      recognition.abort(); // prefer abort to cancel queued events cleanly
+    }
+  } catch (e) {
+    try { recognition.stop(); } catch (e2) { /* ignore */ }
+  }
+  isRecognizing = false;
+  isStarting = false;
+}
 
+// When page becomes visible or window focused, attempt to start
+function handleActiveState() {
+  if (document.visibilityState === "visible" && document.hasFocus()) {
+    console.log("Page active — attempting to start recognition if not running.");
+    startRecognitionWithRetry();
+  } else {
+    console.log("Page not active — stopping recognition (optional).");
+    // Optional: stopRecognition(); // you can keep recognition stopped while user away
+  }
+}
+
+// Bind events to restart when user returns
+document.addEventListener("visibilitychange", handleActiveState);
+window.addEventListener("focus", handleActiveState);
+window.addEventListener("pageshow", handleActiveState);
+
+// Start on initial load (best effort)
+window.addEventListener("load", () => {
+  initRecognition();
+  startRecognitionWithRetry();
+});
+
+// Optional debugging helpers (you can remove if not needed)
+window._voiceAssistantDebug = {
+  start: startRecognitionWithRetry,
+  stop: stopRecognition,
+  status: () => ({ isRecognizing, isStarting, retryCount })
+};
